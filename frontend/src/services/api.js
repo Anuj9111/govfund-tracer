@@ -329,8 +329,6 @@ export const api = {
       if (res.ok) {
         const updatedWork = await res.json();
         return new ApiResponse(200, { success: true, message: `Milestone photo verified for project ${projectId}`, data: updatedWork });
-      } else {
-        return new ApiResponse(res.status, null, { code: 'API_ERROR', message: `Backend returned status ${res.status}` });
       }
     } catch (err) {
       // Fallback
