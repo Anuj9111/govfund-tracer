@@ -600,6 +600,7 @@ export const RiskScoreContractViewer = ({ initialFilter = 'all' }) => {
                   <th className="py-3 px-4">Work ID / IDA</th>
                   <th className="py-3 px-4">State & Category</th>
                   <th className="py-3 px-4">Risk Score</th>
+                  <th className="py-3 px-4">Confidence</th>
                   <th className="py-3 px-4">Anomaly Flags</th>
                   <th className="py-3 px-4 max-w-md">Human-Readable Explanation</th>
                   <th className="py-3 px-4 text-right">Actions</th>
@@ -647,6 +648,14 @@ export const RiskScoreContractViewer = ({ initialFilter = 'all' }) => {
                             {tierMeta.label}
                           </span>
                         </div>
+                      </td>
+
+                      {/* Confidence */}
+                      <td className="py-3.5 px-4 font-mono">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+                          <ShieldAlert className="w-3 h-3 text-emerald-500" />
+                          <span>{Math.round((item.confidence_score ?? item.confidence ?? 0) <= 1.0 ? (item.confidence_score ?? item.confidence ?? 0) * 100 : (item.confidence_score ?? item.confidence ?? 0))}%</span>
+                        </span>
                       </td>
 
                       {/* Multi Flags */}
