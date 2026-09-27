@@ -2,7 +2,7 @@ import os
 import sqlite3
 import json
 from typing import Optional, List, Dict, Any
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Body, Header
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
@@ -37,19 +37,22 @@ def format_work_row(row: sqlite3.Row) -> Dict[str, Any]:
     flags_parsed = []
     if flags_raw:
         try:
-            flags_parsed = json.loads(flags_raw)
+            flags_parsed = json.loads(flags_raw) if isinstance(flags_raw, str) else flags_raw
         except Exception:
             flags_parsed = []
+
+    raw_risk = row["risk_score"]
+    risk_val = int(raw_risk) if raw_risk is not None else 0
 
     return {
         "work_id": row["work_id"],
         "source": row["source"],
-        "state": row["state"],
-        "category": row["category"],
-        "ida": row["ida"],
-        "risk_score": row["risk_score"],
-        "flags": flags_parsed,
-        "explanation": row["explanation"],
+        "state": row["state"] or "Unassigned",
+        "category": row["category"] or "General Infrastructure",
+        "ida": row["ida"] or "IDA-001",
+        "risk_score": risk_val,
+        "flags": flags_parsed if isinstance(flags_parsed, list) else [],
+        "explanation": row["explanation"] or "Compliant with scheme schedule, cost benchmarks, and physical milestones.",
         "work_code": row["work_code"],
         "mp_name": row["mp_name"],
         "constituency": row["constituency"],
@@ -81,8 +84,17 @@ def get_works(
     mp: Optional[str] = Query(None, description="Filter by MP Name"),
     search: Optional[str] = Query(None, description="Search in description or constituency"),
     limit: int = Query(100, ge=1, le=1000, description="Page limit"),
-    offset: int = Query(0, ge=0, description="Offset index")
+    offset: int = Query(0, ge=0, description="Offset index"),
+    x_user_role: Optional[str] = Header(None),
+    x_user_state: Optional[str] = Header(None)
 ):
+    # Enforce strict state-wise access control for State Nodal Officers (SNO)
+    if x_user_role == "state":
+        if not x_user_state:
+            raise HTTPException(status_code=403, detail="Forbidden: State assignment missing for SNO.")
+        if state and state.strip().lower() != x_user_state.strip().lower():
+            raise HTTPException(status_code=403, detail=f"Forbidden: You can only access data for {x_user_state}.")
+        state = x_user_state # Override state filter to force restriction
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -131,7 +143,11 @@ def get_works(
     }
 
 @app.get("/works/{work_id}")
-def get_work_by_id(work_id: str):
+def get_work_by_id(
+    work_id: str,
+    x_user_role: Optional[str] = Header(None),
+    x_user_state: Optional[str] = Header(None)
+):
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("SELECT * FROM works WHERE work_id = ?", (work_id.strip(),))
@@ -141,18 +157,91 @@ def get_work_by_id(work_id: str):
     if not row:
         raise HTTPException(status_code=404, detail=f"Work record with ID '{work_id}' not found.")
 
+    if x_user_role == "state" and x_user_state:
+        row_state = row["state"] or ""
+        if row_state.strip().lower() != x_user_state.strip().lower():
+            raise HTTPException(status_code=403, detail=f"Forbidden: You can only access data for {x_user_state}.")
+
     return format_work_row(row)
 
-@app.get("/works/{work_id}/risk")
-def get_work_risk(work_id: str):
+@app.patch("/works/{work_id}")
+def update_work(
+    work_id: str,
+    work_status: Optional[str] = Body(None),
+    risk_score: Optional[int] = Body(None),
+    flags: Optional[list] = Body(None),
+    explanation: Optional[str] = Body(None),
+    tamperVerified: Optional[bool] = Body(None),
+    geotagMatch: Optional[bool] = Body(None)
+):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT work_id, risk_score, flags, explanation FROM works WHERE work_id = ?", (work_id.strip(),))
+    
+    cur.execute("SELECT * FROM works WHERE work_id = ?", (work_id.strip(),))
+    row = cur.fetchone()
+    
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=404, detail=f"Work record with ID '{work_id}' not found.")
+        
+    update_fields = []
+    params = []
+    
+    if work_status is not None:
+        update_fields.append("work_status = ?")
+        params.append(work_status)
+    
+    if risk_score is not None:
+        update_fields.append("risk_score = ?")
+        params.append(risk_score)
+        
+    if flags is not None:
+        update_fields.append("flags = ?")
+        params.append(json.dumps(flags))
+        
+    if explanation is not None:
+        update_fields.append("explanation = ?")
+        params.append(explanation)
+        
+    if update_fields:
+        query = f"UPDATE works SET {', '.join(update_fields)} WHERE work_id = ?"
+        params.append(work_id.strip())
+        cur.execute(query, params)
+        conn.commit()
+        
+    # Fetch the updated row
+    cur.execute("SELECT * FROM works WHERE work_id = ?", (work_id.strip(),))
+    updated_row = cur.fetchone()
+    conn.close()
+    
+    # Just format and return it, optionally appending extra dynamic fields not in DB
+    formatted = format_work_row(updated_row)
+    if tamperVerified is not None:
+        formatted["tamperVerified"] = tamperVerified
+    if geotagMatch is not None:
+        formatted["geotagMatch"] = geotagMatch
+        
+    return formatted
+
+@app.get("/works/{work_id}/risk")
+def get_work_risk(
+    work_id: str,
+    x_user_role: Optional[str] = Header(None),
+    x_user_state: Optional[str] = Header(None)
+):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT work_id, state, category, ida, risk_score, flags, explanation FROM works WHERE work_id = ?", (work_id.strip(),))
     row = cur.fetchone()
     conn.close()
 
     if not row:
         raise HTTPException(status_code=404, detail=f"Work record with ID '{work_id}' not found.")
+
+    if x_user_role == "state" and x_user_state:
+        row_state = row["state"] or ""
+        if row_state.strip().lower() != x_user_state.strip().lower():
+            raise HTTPException(status_code=403, detail=f"Forbidden: You can only access data for {x_user_state}.")
 
     flags_raw = row["flags"]
     flags_parsed = []
@@ -164,29 +253,43 @@ def get_work_risk(work_id: str):
 
     return {
         "work_id": row["work_id"],
-        "risk_score": row["risk_score"],
+        "state": row["state"] or "Unassigned",
+        "category": row["category"] or "General",
+        "ida": row["ida"] or "IDA-001",
+        "risk_score": row["risk_score"] if row["risk_score"] is not None else 0,
         "flags": flags_parsed,
-        "explanation": row["explanation"]
+        "explanation": row["explanation"] or "Compliant with scheme benchmarks."
     }
 
 @app.get("/summary")
-def get_summary():
+def get_summary(
+    x_user_role: Optional[str] = Header(None),
+    x_user_state: Optional[str] = Header(None)
+):
     conn = get_db_connection()
     cur = conn.cursor()
 
-    cur.execute("SELECT COUNT(*), COALESCE(SUM(sanction_amount), 0), COALESCE(SUM(amount_disbursed), 0) FROM works")
+    query_prefix = "SELECT COUNT(*), COALESCE(SUM(sanction_amount), 0), COALESCE(SUM(amount_disbursed), 0) FROM works WHERE 1=1"
+    params = []
+    state_filter = ""
+    
+    if x_user_role == "state" and x_user_state:
+        state_filter = " AND LOWER(state) = LOWER(?)"
+        params.append(x_user_state.strip())
+
+    cur.execute(query_prefix + state_filter, params)
     tot_works, tot_sanctioned, tot_disbursed = cur.fetchone()
 
-    cur.execute("SELECT state, COUNT(*), COALESCE(SUM(sanction_amount), 0) FROM works GROUP BY state ORDER BY COUNT(*) DESC")
+    cur.execute(f"SELECT state, COUNT(*), COALESCE(SUM(sanction_amount), 0) FROM works WHERE 1=1 {state_filter} GROUP BY state ORDER BY COUNT(*) DESC", params)
     state_rows = cur.fetchall()
 
-    cur.execute("SELECT category, COUNT(*), COALESCE(SUM(sanction_amount), 0) FROM works GROUP BY category ORDER BY COUNT(*) DESC")
+    cur.execute(f"SELECT category, COUNT(*), COALESCE(SUM(sanction_amount), 0) FROM works WHERE 1=1 {state_filter} GROUP BY category ORDER BY COUNT(*) DESC", params)
     cat_rows = cur.fetchall()
 
-    cur.execute("SELECT work_status, COUNT(*) FROM works GROUP BY work_status ORDER BY COUNT(*) DESC")
+    cur.execute(f"SELECT work_status, COUNT(*) FROM works WHERE 1=1 {state_filter} GROUP BY work_status ORDER BY COUNT(*) DESC", params)
     status_rows = cur.fetchall()
 
-    cur.execute("SELECT source, COUNT(*) FROM works GROUP BY source ORDER BY COUNT(*) DESC")
+    cur.execute(f"SELECT source, COUNT(*) FROM works WHERE 1=1 {state_filter} GROUP BY source ORDER BY COUNT(*) DESC", params)
     source_rows = cur.fetchall()
 
     conn.close()

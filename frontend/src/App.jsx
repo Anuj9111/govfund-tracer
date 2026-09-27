@@ -27,6 +27,7 @@ import PredictiveInsights from './pages/PredictiveInsights';
 import Reports           from './pages/Reports';
 import AdminPanel        from './pages/AdminPanel';
 import NotFound          from './pages/NotFound';
+import LandingPage       from './pages/LandingPage';
 
 import { CheckCircle2, AlertTriangle, Info, ShieldAlert } from 'lucide-react';
 
@@ -226,6 +227,15 @@ export const App = () => {
         <AuthProvider>
           <DataProvider>
             <Routes>
+              <Route
+                path="/"
+                element={
+                  <AuthRedirect>
+                    <LandingPage />
+                  </AuthRedirect>
+                }
+              />
+
               {/* Login — redirect authenticated users away */}
               <Route
                 path="/login"

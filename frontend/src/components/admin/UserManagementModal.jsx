@@ -17,6 +17,9 @@ export const UserManagementModal = ({ isOpen, onClose, onSaveUser }) => {
     constituency: '',
     state: 'Uttar Pradesh',
     district: 'Varanasi',
+    mpId: '',
+    password: '',
+    status: 'Active',
     allocatedBudget: 250000000,
     jurisdiction: '',
   });
@@ -26,7 +29,7 @@ export const UserManagementModal = ({ isOpen, onClose, onSaveUser }) => {
       mp: { roleName: 'Member of Parliament (Lok Sabha)', jurisdiction: `${formData.constituency || 'Varanasi'} Constituency` },
       district: { roleName: 'District Magistrate & District Authority', jurisdiction: `${formData.district || 'Varanasi'} District` },
       state: { roleName: 'Principal Secretary & State Nodal Officer', jurisdiction: `State of ${formData.state || 'Uttar Pradesh'}` },
-      ministry: { roleName: 'Joint Secretary (MPLADS), MoSPI', jurisdiction: 'Pan-India Nationwide' },
+      ministry: { roleName: 'Joint Secretary (GovFund Tracer), MoSPI', jurisdiction: 'Pan-India Nationwide' },
       admin: { roleName: 'System Administrator', jurisdiction: 'System-wide' },
     };
 
@@ -36,12 +39,13 @@ export const UserManagementModal = ({ isOpen, onClose, onSaveUser }) => {
       role: selectedRole,
       roleName: currentMeta.roleName,
       jurisdiction: currentMeta.jurisdiction,
+      // reset specific scopes if needed, but keeping them keeps user input intact
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.email) return;
+    if (!formData.name || !formData.email || !formData.password) return;
 
     let computedJurisdiction = formData.jurisdiction;
     if (!computedJurisdiction) {
@@ -122,37 +126,87 @@ export const UserManagementModal = ({ isOpen, onClose, onSaveUser }) => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
-                State
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. Uttar Pradesh, Maharashtra, Bihar"
-                value={formData.state}
-                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                className="w-full p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
-              />
-            </div>
+            {formData.role !== ROLES.MINISTRY && formData.role !== ROLES.ADMIN && (
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                  State
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Uttar Pradesh"
+                  value={formData.state}
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                  className="w-full p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100"
+                />
+              </div>
+            )}
 
-            <div>
-              <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
-                District / Constituency
-              </label>
-              <input
-                type="text"
-                placeholder="e.g. Varanasi, Patna, Pune"
-                value={formData.district}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    district: e.target.value,
-                    constituency: e.target.value,
-                  })
-                }
-                className="w-full p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
-              />
-            </div>
+            {(formData.role === ROLES.DISTRICT || formData.role === ROLES.MP) && (
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                  District / Constituency
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Varanasi"
+                  value={formData.district}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      district: e.target.value,
+                      constituency: e.target.value,
+                    })
+                  }
+                  className="w-full p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100"
+                />
+              </div>
+            )}
+
+            {formData.role === ROLES.MP && (
+              <div className="sm:col-span-2">
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
+                  MP ID (Optional Reference)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. MP-104"
+                  value={formData.mpId}
+                  onChange={(e) => setFormData({ ...formData, mpId: e.target.value })}
+                  className="w-full p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Credentials and Status */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+              Temporary Password *
+            </label>
+            <input
+              type="password"
+              required
+              placeholder="Assign a secure password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100"
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">
+              Account Status
+            </label>
+            <select
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              className="w-full p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-medium"
+            >
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
           </div>
         </div>
 

@@ -9,6 +9,7 @@ import IndiaMap from '../components/dashboard/IndiaMap';
 import RiskOverviewWidget from '../components/dashboard/RiskOverviewWidget';
 import TopAlertsWidget from '../components/dashboard/TopAlertsWidget';
 import FundFunnelChart from '../components/dashboard/FundFunnelChart';
+import StateNodalDashboard from '../components/dashboard/StateNodalDashboard';
 import PaymentTimelineChart from '../components/analytics/PaymentTimelineChart';
 import AlertDetailModal from '../components/alerts/AlertDetailModal';
 import {
@@ -26,6 +27,7 @@ import {
   Layers,
   MapPin,
   Lock,
+  Search,
 } from 'lucide-react';
 import { formatINR, formatNumber } from '../utils/formatters';
 import { ROLES } from '../services/rbacService';
@@ -47,6 +49,8 @@ export const Dashboard = () => {
     roleKpis,
     runAiDiagnostics,
     isAiRunning,
+    globalSearch,
+    setGlobalSearch,
   } = useData();
 
   const [selectedState, setSelectedState] = useState(null);
@@ -72,23 +76,23 @@ export const Dashboard = () => {
   return (
     <div className="space-y-6">
       {/* Role Context & Welcome Banner */}
-      <div className="bg-gradient-to-r from-gov-navy to-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-gov-md border border-slate-800 flex flex-wrap items-center justify-between gap-4 relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 w-60 h-60 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-2xl p-5 sm:p-6 shadow-gov-md border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4 relative overflow-hidden">
+        <div className="absolute -right-10 -bottom-10 w-60 h-60 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-2xl">
           <div className="flex items-center gap-2 mb-1.5">
             <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-orange-500 text-white font-mono uppercase">
               {currentUser.roleName}
             </span>
-            <span className="text-xs text-slate-300 font-medium flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5 text-orange-400" />
+            <span className="text-xs text-slate-600 dark:text-slate-300 font-medium flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5 text-orange-500 dark:text-orange-400" />
               {currentUser.jurisdiction}
             </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-extrabold font-display tracking-tight text-white">
+          <h2 className="text-xl sm:text-2xl font-extrabold font-display tracking-tight text-slate-900 dark:text-white">
             Welcome, {currentUser.name}
           </h2>
-          <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
             {currentRole === ROLES.MP && (
               <>
                 Monitoring <strong>{works.length}</strong> sanctioned works in your constituency. Showing fund utilization and high-risk alerts.
@@ -173,14 +177,19 @@ export const Dashboard = () => {
         />
       </div>
 
-      {/* Main Grid: Heatmap (State/National) or Scoped Works (MP/District) + Top Alerts */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        {/* Left Side: Map for State/Ministry or Project Progress List for MP/District */}
-        <div className="xl:col-span-7">
-          {currentRole === ROLES.MINISTRY || currentRole === ROLES.STATE ? (
+      {/* Main Grid: Heatmap (State/National) or Scoped Works (MP/District) */}
+      <div className="grid grid-cols-1 gap-6">
+        <div>
+          {currentRole === ROLES.MINISTRY ? (
             <IndiaMap
               selectedStateId={selectedState?.id}
               onSelectState={(st) => setSelectedState(st)}
+            />
+          ) : currentRole === ROLES.STATE ? (
+            <StateNodalDashboard 
+              currentUser={currentUser} 
+              works={works} 
+              alerts={alerts} 
             />
           ) : (
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-gov space-y-4">
@@ -196,76 +205,89 @@ export const Dashboard = () => {
                 </span>
               </div>
 
-              <div className="space-y-3">
-                {works.slice(0, 4).map((work) => (
-                  <div
-                    key={work.id}
-                    className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 hover:border-slate-300 transition-all"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-mono text-[10px] font-bold text-slate-500">{work.id}</span>
-                          <span
-                            className={`px-2 py-0.2 rounded text-[10px] font-bold ${
-                              work.stage === 'completed'
-                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                                : work.stage === 'delayed'
-                                ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300'
-                                : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
-                            }`}
-                          >
-                            {work.stage.toUpperCase()}
-                          </span>
-                        </div>
-                        <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
-                          {work.title}
-                        </h4>
-                        <div className="text-[11px] text-slate-500 mt-0.5">
-                          {work.agency} • {work.category}
-                        </div>
-                      </div>
+              <div className="relative mb-4">
+                <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder={t('search') || 'Search projects...'}
+                  value={globalSearch}
+                  onChange={(e) => setGlobalSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm"
+                />
+              </div>
 
-                      <div className="text-right shrink-0">
-                        <div className="text-xs font-bold font-mono text-slate-900 dark:text-slate-100">
-                          {formatINR(work.sanctionedAmount)}
+              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                {works
+                  .filter((work) => {
+                    // Global search filter
+                    if (globalSearch) {
+                      const q = globalSearch.toLowerCase();
+                      const matches = work.title.toLowerCase().includes(q) ||
+                        work.id.toLowerCase().includes(q) ||
+                        work.category.toLowerCase().includes(q) ||
+                        work.agency.toLowerCase().includes(q);
+                      if (!matches) return false;
+                    }
+                    return true;
+                  })
+                  .slice(0, 10)
+                  .map((work) => (
+                    <div
+                      key={work.id}
+                      className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 hover:border-slate-300 transition-all"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-mono text-[10px] font-bold text-slate-500">{work.id}</span>
+                            <span
+                              className={`px-2 py-0.2 rounded text-[10px] font-bold ${work.stage === 'completed'
+                                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                                  : work.stage === 'delayed'
+                                    ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300'
+                                    : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                                }`}
+                            >
+                              {work.stage.toUpperCase()}
+                            </span>
+                          </div>
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                            {work.title}
+                          </h4>
+                          <div className="text-[11px] text-slate-500 mt-0.5">
+                            {work.agency} • {work.category}
+                          </div>
                         </div>
-                        <div className="text-[11px] text-emerald-600 font-bold font-mono">
-                          {work.physicalProgress}% Done
+
+                        <div className="text-right shrink-0">
+                          <div className="text-xs font-bold font-mono text-slate-900 dark:text-slate-100">
+                            {formatINR(work.sanctionedAmount)}
+                          </div>
+                          <div className="text-[11px] text-emerald-600 font-bold font-mono">
+                            {work.physicalProgress}% Done
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           )}
         </div>
-
-        {/* Top Alerts Widget (Scoped to user jurisdiction) */}
-        <div className="xl:col-span-5">
-          <TopAlertsWidget
-            alerts={alerts}
-            onSelectAlert={(a) => setSelectedAlert(a)}
-            onQuickAction={handleAlertAction}
-          />
-        </div>
       </div>
 
-      {/* Second Row: Risk Distribution + Funnel */}
+      {/* Second Row: Risk Distribution + Top Alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-4">
           <RiskOverviewWidget kpis={roleKpis} />
         </div>
 
         <div className="lg:col-span-8">
-          <ChartCard
-            title="Sanction-to-Expenditure Pipeline Funnel"
-            subtitle="Drop-off points across MP Recommendation → Admin Sanction → 1st Installment → UC Settlement"
-            infoTooltip="Tracks where administrative bottlenecks occur before funds convert to physical assets"
-          >
-            <FundFunnelChart />
-          </ChartCard>
+          <TopAlertsWidget
+            alerts={alerts}
+            onSelectAlert={(a) => setSelectedAlert(a)}
+            onQuickAction={handleAlertAction}
+          />
         </div>
       </div>
 
@@ -290,3 +312,4 @@ export const Dashboard = () => {
 };
 
 export default Dashboard;
+

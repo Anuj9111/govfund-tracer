@@ -21,7 +21,7 @@ export const DataTable = ({
   data = [],
   searchKey,
   pageSize = 8,
-  exportFilename = 'MPLADS_Data_Export.csv',
+  exportFilename = 'GovFund_Tracer_Data_Export.csv',
   onRowClick,
   filterSlot,
 }) => {

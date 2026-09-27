@@ -33,10 +33,10 @@ export const Reports = () => {
   const handleDownloadReport = (format) => {
     triggerCelebration();
     if (format === 'csv') {
-      exportToCSV(works, `MPLADS_${currentUser.jurisdiction.replace(/[^a-zA-Z0-9]/g, '_')}_Report_${fiscalYear}.csv`);
+      exportToCSV(works, `GovFund_Tracer_${currentUser.jurisdiction.replace(/[^a-zA-Z0-9]/g, '_')}_Report_${fiscalYear}.csv`);
       showToast('CSV Report downloaded successfully');
     } else if (format === 'json') {
-      exportToJSON({ kpis: roleKpis, alerts, works, authority: currentUser }, `MPLADS_Dossier_${fiscalYear}.json`);
+      exportToJSON({ kpis: roleKpis, alerts, works, authority: currentUser }, `GovFund_Tracer_Dossier_${fiscalYear}.json`);
       showToast('JSON Dataset exported successfully');
     } else {
       printDossier();
@@ -168,7 +168,7 @@ export const Reports = () => {
             Ministry of Statistics and Programme Implementation (MoSPI)
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Members of Parliament Local Area Development Scheme (MPLADS)
+            Members of Parliament Local Area Development Scheme (GovFund Tracer)
           </p>
           <div className="mt-2 text-xs font-mono font-bold text-orange-600 dark:text-orange-400">
             {reportType === 'annual_dossier' && `OFFICIAL SCHEME PERFORMANCE DOSSIER — FY ${fiscalYear}`}

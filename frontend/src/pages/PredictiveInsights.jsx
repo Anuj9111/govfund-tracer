@@ -61,50 +61,9 @@ export const PredictiveInsights = () => {
         <PaymentTimelineChart />
       </ChartCard>
 
-      {/* Radar Comparative Benchmarking + Bar Comparison */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Radar Chart */}
-        <div className="lg:col-span-6">
-          <ChartCard
-            title="Multi-Dimensional Peer Benchmarking"
-            subtitle="Constituency vs State Average vs National Average (Scale 0-100)"
-          >
-            <div className="w-full h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <RadarChart outerRadius={90} data={MOCK_BENCHMARKS}>
-                  <PolarGrid stroke="#64748B" opacity={0.2} />
-                  <PolarAngleAxis dataKey="metric" tick={{ fontSize: 10, fill: '#64748B' }} />
-                  <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 9 }} />
-                  <Radar
-                    name="This Constituency"
-                    dataKey="constituency"
-                    stroke="#FF671F"
-                    fill="#FF671F"
-                    fillOpacity={0.4}
-                  />
-                  <Radar
-                    name="State Average"
-                    dataKey="stateAvg"
-                    stroke="#1E4E8C"
-                    fill="#1E4E8C"
-                    fillOpacity={0.25}
-                  />
-                  <Radar
-                    name="National Benchmark"
-                    dataKey="nationalAvg"
-                    stroke="#10B981"
-                    fill="#10B981"
-                    fillOpacity={0.15}
-                  />
-                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-          </ChartCard>
-        </div>
-
-        {/* Agency Compliance Scorecard */}
-        <div className="lg:col-span-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-gov flex flex-col justify-between">
+      {/* Agency Compliance Scorecard */}
+      <div className="grid grid-cols-1 gap-6">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-gov flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <div>

@@ -155,7 +155,7 @@ export const RiskScoreContractViewer = ({ initialFilter = 'all' }) => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `mplads_risk_contract_records_${Date.now()}.json`;
+    link.download = `GovFund_Tracer_risk_contract_records_${Date.now()}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

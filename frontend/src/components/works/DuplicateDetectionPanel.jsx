@@ -18,7 +18,7 @@ export const DuplicateDetectionPanel = ({ onEscalateDuplicate }) => {
             <span>AI Geo-Spatial & Semantic Duplicate Detector</span>
           </h4>
           <p className="text-xs text-purple-900/80 dark:text-purple-300 mt-1 max-w-2xl">
-            Continuously cross-references new MPLADS sanctions against PMGSY, Jal Jeevan Mission, Smart Cities, and State PWD project registries within 100m GPS radius.
+            Continuously cross-references new GovFund Tracer sanctions against PMGSY, Jal Jeevan Mission, Smart Cities, and State PWD project registries within 100m GPS radius.
           </p>
         </div>
 
@@ -56,10 +56,10 @@ export const DuplicateDetectionPanel = ({ onEscalateDuplicate }) => {
 
             {/* Side-by-Side Comparison Box */}
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Work A (MPLADS) */}
+              {/* Work A (GovFund Tracer) */}
               <div className="p-3.5 rounded-lg bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800/60">
                 <div className="flex items-center justify-between text-[11px] font-bold text-blue-700 dark:text-blue-300 mb-1">
-                  <span>Sanctioned Under MPLADS</span>
+                  <span>Sanctioned Under GovFund Tracer</span>
                   <span className="font-mono">{pair.workA.id}</span>
                 </div>
                 <h5 className="text-xs font-bold text-slate-900 dark:text-slate-100">

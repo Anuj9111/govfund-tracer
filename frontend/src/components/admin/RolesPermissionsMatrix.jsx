@@ -9,7 +9,7 @@ import { ShieldCheck, XCircle, CheckCircle2, Shield, Lock, Layers } from 'lucide
 
 /**
  * RolesPermissionsMatrix Component
- * Interactive visual representation of the RBAC capability matrix across all 5 official MPLADS roles.
+ * Interactive visual representation of the RBAC capability matrix across all 5 official GovFund Tracer roles.
  */
 export const RolesPermissionsMatrix = () => {
   const permissionCategories = [

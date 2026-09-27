@@ -76,7 +76,7 @@ export const AuditLogsTable = ({ logs = [] }) => {
         data={logs}
         searchKey="action"
         pageSize={8}
-        exportFilename="MPLADS_System_Audit_Logs.csv"
+        exportFilename="GovFund_Tracer_System_Audit_Logs.csv"
       />
     </div>
   );
