@@ -43,8 +43,8 @@ export const AlertCard = ({
         className="group relative bg-white dark:bg-slate-900 rounded-lg p-3.5 border border-slate-200 dark:border-slate-800 hover:border-red-300 dark:hover:border-red-800 shadow-sm hover:shadow-gov cursor-pointer transition-all duration-200"
       >
         <div className="flex items-center justify-between gap-2 mb-1.5">
-          <span className={`text-[11px] font-semibold px-2 py-0.5 rounded border ${catMeta.color}`}>
-            {catMeta.label}
+          <span className={`text-[11px] font-semibold px-2 py-0.5 rounded border ${alert.categoryColor || catMeta.color}`}>
+            {alert.categoryLabel || catMeta.label}
           </span>
           <RiskBadge level={alert.riskLevel} score={alert.riskScore} size="sm" showPulse={false} />
         </div>
@@ -71,8 +71,8 @@ export const AlertCard = ({
       {/* Top Meta Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2">
-          <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${catMeta.color}`}>
-            {catMeta.label}
+          <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${alert.categoryColor || catMeta.color}`}>
+            {alert.categoryLabel || catMeta.label}
           </span>
           <span className="text-xs font-mono text-slate-700 dark:text-slate-300 font-medium">
             {alert.id}

@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { formatINR, formatNumber } from '../utils/formatters';
 import { ROLES } from '../services/rbacService';
+import { FLAG_METADATA } from '../data/riskContractData';
 
 /**
  * Dashboard Page Component
@@ -47,13 +48,12 @@ export const Dashboard = () => {
     setSelectedAlert,
     handleAlertAction,
     roleKpis,
-    runAiDiagnostics,
-    isAiRunning,
     globalSearch,
     setGlobalSearch,
   } = useData();
 
   const [selectedState, setSelectedState] = useState(null);
+  const [selectedStage, setSelectedStage] = useState('ALL');
 
   if (isLoading) {
     return (
@@ -72,6 +72,34 @@ export const Dashboard = () => {
       </div>
     );
   }
+
+  const realTopAlerts = [...works]
+    .filter(w => w.risk_score && w.risk_score > 0)
+    .sort((a, b) => b.risk_score - a.risk_score)
+    .map(w => {
+      const primaryFlag = w.flags && w.flags.length > 0 ? w.flags[0] : 'UNKNOWN';
+      const meta = FLAG_METADATA[primaryFlag] || { label: 'General Anomaly', badgeClass: 'bg-red-100 text-red-800 border-red-200' };
+
+      return {
+        id: `ALT-${w.ida}`,
+        workId: w.ida,
+        title: w.work_description || w.title,
+        category: 'custom',
+        categoryLabel: meta.label,
+        categoryColor: meta.badgeClass,
+        riskLevel: w.risk_score >= 80 ? 'critical' : 'high',
+        riskScore: w.risk_score || 0,
+        confidence: '95%',
+        dateFlagged: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+        state: w.state || 'UP',
+        district: w.district || 'Varanasi',
+        implementingAgency: w.agency || 'PWD',
+        sanctionedAmount: w.total_cost || w.sanctionedAmount || 0,
+        expenditureSoFar: w.expenditureSoFar || (w.total_cost * 0.5) || 0,
+        status: 'active',
+        summary: w.explanation || 'High risk score based on anomaly detection models.',
+      };
+    });
 
   return (
     <div className="space-y-6">
@@ -121,17 +149,6 @@ export const Dashboard = () => {
           </p>
         </div>
 
-        <div className="relative z-10 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={runAiDiagnostics}
-            disabled={isAiRunning}
-            className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-md flex items-center gap-2 transition-all"
-          >
-            <Sparkles className={`w-4 h-4 ${isAiRunning ? 'animate-spin' : ''}`} />
-            <span>{isAiRunning ? 'Scanning Works...' : 'Run Diagnostics'}</span>
-          </button>
-        </div>
       </div>
 
       {/* 4 Primary Multi-Metric KPI Cards (Scoped to Role) */}
@@ -216,18 +233,45 @@ export const Dashboard = () => {
                 />
               </div>
 
+              {/* Progress Filter Buttons */}
+              <div className="flex flex-wrap items-center gap-2 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">
+                {['ALL', 'Sanctioned', 'In Progress', 'Delayed / At Risk', 'Physically Completed'].map((stage) => (
+                  <button
+                    key={stage}
+                    onClick={() => setSelectedStage(stage)}
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all ${
+                      selectedStage === stage
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    {stage}
+                  </button>
+                ))}
+              </div>
+
               <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                 {works
                   .filter((work) => {
                     // Global search filter
                     if (globalSearch) {
                       const q = globalSearch.toLowerCase();
-                      const matches = work.title.toLowerCase().includes(q) ||
-                        work.id.toLowerCase().includes(q) ||
-                        work.category.toLowerCase().includes(q) ||
-                        work.agency.toLowerCase().includes(q);
+                      const matches = work.title?.toLowerCase().includes(q) ||
+                        work.id?.toLowerCase().includes(q) ||
+                        work.category?.toLowerCase().includes(q) ||
+                        work.agency?.toLowerCase().includes(q);
                       if (!matches) return false;
                     }
+                    
+                    // Stage filter
+                    if (selectedStage !== 'ALL') {
+                      const workStage = (work.stage || '').toLowerCase();
+                      if (selectedStage === 'Sanctioned' && !workStage.includes('sanctioned')) return false;
+                      if (selectedStage === 'In Progress' && !(workStage.includes('progress') || workStage.includes('ongoing'))) return false;
+                      if (selectedStage === 'Delayed / At Risk' && !(workStage.includes('delay') || workStage.includes('risk') || workStage.includes('hold'))) return false;
+                      if (selectedStage === 'Physically Completed' && !workStage.includes('complet')) return false;
+                    }
+                    
                     return true;
                   })
                   .slice(0, 10)
@@ -284,7 +328,7 @@ export const Dashboard = () => {
 
         <div className="lg:col-span-8">
           <TopAlertsWidget
-            alerts={alerts}
+            alerts={realTopAlerts.length > 0 ? realTopAlerts : alerts}
             onSelectAlert={(a) => setSelectedAlert(a)}
             onQuickAction={handleAlertAction}
           />

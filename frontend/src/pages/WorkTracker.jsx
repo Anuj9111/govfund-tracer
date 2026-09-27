@@ -28,6 +28,7 @@ export const WorkTracker = () => {
   const { currentUser, hasPermission } = useAuth();
   const [activeTab, setActiveTab] = useState('kanban'); // 'kanban' | 'duplicates'
   const [verifyingWork, setVerifyingWork] = useState(null);
+  const [selectedStage, setSelectedStage] = useState('ALL');
 
   const canApproveMilestones = hasPermission(PERMISSIONS.APPROVE_MILESTONES);
   const delayedCount = works.filter((w) => w.stage === 'delayed').length;
@@ -133,10 +134,30 @@ export const WorkTracker = () => {
         </div>
       </div>
 
+      {/* Progress Filter Buttons */}
+      {activeTab === 'kanban' && (
+        <div className="flex flex-wrap items-center gap-2 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800 mt-6">
+          {['ALL', 'Sanctioned', 'In Progress', 'Delayed / At Risk', 'Physically Completed'].map((stage) => (
+            <button
+              key={stage}
+              onClick={() => setSelectedStage(stage)}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-all ${
+                selectedStage === stage
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              {stage}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Main Tab Content */}
       {activeTab === 'kanban' ? (
         <WorkKanban
           works={works}
+          selectedStage={selectedStage}
           onSelectWork={(w) => setVerifyingWork(w)}
           onVerifyPhotos={(w) => {
             if (!canApproveMilestones) {

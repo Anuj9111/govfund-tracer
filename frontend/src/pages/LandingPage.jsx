@@ -32,10 +32,8 @@ export const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded bg-slate-900 flex items-center justify-center">
-                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-amber-400">
-                  <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 4a3 3 0 110 6 3 3 0 010-6zm0 13c-2.7 0-5.8-1.29-6-2.5V16c1.8-1.5 3.9-2 6-2s4.2.5 6 2v.5c-.2 1.21-3.3 2.5-6 2.5z" />
-                </svg>
+              <div className="w-8 h-8 rounded bg-white flex items-center justify-center overflow-hidden border border-slate-200">
+                <img src="/custom-logo.jpg" alt="GovFund Tracer Logo" className="w-full h-full object-cover" />
               </div>
               <span className="font-extrabold text-lg tracking-tight">
                 GovFund <span className="text-orange-600">Tracer</span>
@@ -312,9 +310,9 @@ export const LandingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-1">
               <div className="flex items-center gap-2 mb-4 text-white">
-                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-amber-400">
-                  <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 4a3 3 0 110 6 3 3 0 010-6zm0 13c-2.7 0-5.8-1.29-6-2.5V16c1.8-1.5 3.9-2 6-2s4.2.5 6 2v.5c-.2 1.21-3.3 2.5-6 2.5z" />
-                </svg>
+                <div className="w-5 h-5 rounded overflow-hidden border border-slate-700 bg-white">
+                  <img src="/custom-logo.jpg" alt="GovFund Tracer Logo" className="w-full h-full object-cover" />
+                </div>
                 <span className="font-bold text-lg">GovFund Tracer Monitor</span>
               </div>
               <p className="text-sm leading-relaxed max-w-xs">

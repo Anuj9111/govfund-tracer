@@ -29,6 +29,7 @@ import RiskScoreModal from './RiskScoreModal';
 import RiskContractLiveTester from './RiskContractLiveTester';
 import {
   FLAG_METADATA,
+
   KNOWN_FLAGS,
   getRiskTier,
   getRiskTierMeta,
@@ -41,7 +42,6 @@ export const RiskScoreContractViewer = ({ initialFilter = 'all' }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRiskTier, setSelectedRiskTier] = useState(initialFilter); // 'all' | 'high' | 'medium' | 'low'
   const [selectedFlag, setSelectedFlag] = useState('all'); // 'all' | 'cost_outlier' | 'possible_duplicate' | 'delayed' | 'fund_mismatch' | 'multiple' | 'none'
-  const [selectedState, setSelectedState] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [inspectingWork, setInspectingWork] = useState(null);
   const [copiedAllJson, setCopiedAllJson] = useState(false);
@@ -64,11 +64,7 @@ export const RiskScoreContractViewer = ({ initialFilter = 'all' }) => {
     fetchRiskScores();
   }, [currentRole, currentUser, isAuthenticated]);
 
-  // Extract unique states and categories from records
-  const uniqueStates = useMemo(() => {
-    const set = new Set(liveRecords.map((r) => r.state));
-    return ['all', ...Array.from(set).sort()];
-  }, [liveRecords]);
+  // Extract unique categories from records
 
   const uniqueCategories = useMemo(() => {
     const set = new Set(liveRecords.map((r) => r.category));
@@ -96,9 +92,6 @@ export const RiskScoreContractViewer = ({ initialFilter = 'all' }) => {
         return false;
       }
 
-      // State filter
-      if (selectedState !== 'all' && item.state !== selectedState) return false;
-
       // Category filter
       if (selectedCategory !== 'all' && item.category !== selectedCategory) return false;
 
@@ -118,7 +111,7 @@ export const RiskScoreContractViewer = ({ initialFilter = 'all' }) => {
 
       return true;
     });
-  }, [selectedRiskTier, selectedFlag, selectedState, selectedCategory, searchQuery, liveRecords]);
+  }, [selectedRiskTier, selectedFlag, selectedCategory, searchQuery, liveRecords]);
 
   // Summary Metrics
   const stats = useMemo(() => {
@@ -164,7 +157,6 @@ export const RiskScoreContractViewer = ({ initialFilter = 'all' }) => {
   const resetFilters = () => {
     setSelectedRiskTier('all');
     setSelectedFlag('all');
-    setSelectedState('all');
     setSelectedCategory('all');
     setSearchQuery('');
   };
@@ -172,7 +164,6 @@ export const RiskScoreContractViewer = ({ initialFilter = 'all' }) => {
   const hasActiveFilters =
     selectedRiskTier !== 'all' ||
     selectedFlag !== 'all' ||
-    selectedState !== 'all' ||
     selectedCategory !== 'all' ||
     searchQuery.trim() !== '';
 
@@ -428,22 +419,6 @@ export const RiskScoreContractViewer = ({ initialFilter = 'all' }) => {
 
           {/* Selectors and View Mode Switcher */}
           <div className="flex flex-wrap items-center gap-2">
-            {/* State Selector */}
-            <select
-              value={selectedState}
-              onChange={(e) => setSelectedState(e.target.value)}
-              className="px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="all">All States</option>
-              {uniqueStates
-                .filter((s) => s !== 'all')
-                .map((st) => (
-                  <option key={st} value={st}>
-                    {st}
-                  </option>
-                ))}
-            </select>
-
             {/* Category Selector */}
             <select
               value={selectedCategory}
@@ -599,6 +574,7 @@ export const RiskScoreContractViewer = ({ initialFilter = 'all' }) => {
                   <th className="py-3 px-4">Work ID / IDA</th>
                   <th className="py-3 px-4">State & Category</th>
                   <th className="py-3 px-4">Risk Score</th>
+                  <th className="py-3 px-4">Confidence</th>
                   <th className="py-3 px-4">Anomaly Flags</th>
                   <th className="py-3 px-4 max-w-md">Human-Readable Explanation</th>
                   <th className="py-3 px-4 text-right">Actions</th>
@@ -646,6 +622,14 @@ export const RiskScoreContractViewer = ({ initialFilter = 'all' }) => {
                             {tierMeta.label}
                           </span>
                         </div>
+                      </td>
+
+                      {/* Confidence */}
+                      <td className="py-3.5 px-4 font-mono">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+                          <ShieldAlert className="w-3 h-3 text-emerald-500" />
+                          <span>{Math.round((item.confidence_score ?? item.confidence ?? 0) <= 1.0 ? (item.confidence_score ?? item.confidence ?? 0) * 100 : (item.confidence_score ?? item.confidence ?? 0))}%</span>
+                        </span>
                       </td>
 
                       {/* Multi Flags */}

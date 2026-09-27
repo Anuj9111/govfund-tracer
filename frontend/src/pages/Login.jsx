@@ -493,10 +493,8 @@ export const Login = () => {
             <div className="p-7 sm:p-8">
               {/* ── Branding ── */}
               <div className="text-center mb-7">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 shadow-lg shadow-orange-500/30 mb-4">
-                  <svg viewBox="0 0 24 24" className="w-8 h-8 fill-white">
-                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 4a3 3 0 110 6 3 3 0 010-6zm0 13c-2.7 0-5.8-1.29-6-2.5V16c1.8-1.5 3.9-2 6-2s4.2.5 6 2v.5c-.2 1.21-3.3 2.5-6 2.5z" />
-                  </svg>
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl shadow-lg shadow-orange-500/30 mb-4 overflow-hidden border border-slate-200">
+                  <img src="/custom-logo.jpg" alt="GovFund Tracer Logo" className="w-full h-full object-cover" />
                 </div>
                 <h1 className="text-xl font-extrabold font-display tracking-tight text-slate-900">
                   GovFund <span className="text-orange-500">Tracer</span>

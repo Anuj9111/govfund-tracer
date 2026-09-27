@@ -17,7 +17,6 @@ export const DataProvider = ({ children }) => {
   const [roleKpis, setRoleKpis] = useState(MOCK_KPIS[currentRole] || MOCK_KPIS.mp);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedAlert, setSelectedAlert] = useState(null);
-  const [isAiRunning, setIsAiRunning] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [lastSecurityEvent, setLastSecurityEvent] = useState(null);
   const [globalSearch, setGlobalSearch] = useState('');
@@ -167,19 +166,7 @@ export const DataProvider = ({ children }) => {
     return res;
   };
 
-  /**
-   * Run Simulated AI Model Diagnostics across active works
-   */
-  const runAiDiagnostics = () => {
-    setIsAiRunning(true);
-    showToast('AI Anomaly Engine running inference on authorized works...', 'info');
 
-    setTimeout(() => {
-      setIsAiRunning(false);
-      showToast('AI Diagnostic Scan complete. 0 new critical breaches found.', 'success');
-      triggerCelebration();
-    }, 1800);
-  };
 
   /**
    * Dismiss notification
@@ -204,8 +191,6 @@ export const DataProvider = ({ children }) => {
         handleVerifyPhoto,
         testIdTampering,
         lastSecurityEvent,
-        isAiRunning,
-        runAiDiagnostics,
         notifications,
         markNotificationRead,
         toastMessage,

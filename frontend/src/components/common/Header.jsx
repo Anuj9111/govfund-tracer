@@ -32,7 +32,7 @@ import { ROLE_DEFINITIONS } from '../../services/rbacService';
 export const Header = ({ onSearch, isDarkMode, toggleDarkMode, onToggleMobileSidebar }) => {
   const { currentRole, currentUser, currentUserKey, logout } = useAuth();
   const { t } = useLanguage();
-  const { isAiRunning, runAiDiagnostics, testIdTampering, globalSearch, setGlobalSearch } = useData();
+  const { testIdTampering, globalSearch, setGlobalSearch } = useData();
   const navigate = useNavigate();
 
   const [profileOpen, setProfileOpen] = useState(false);
@@ -84,10 +84,8 @@ export const Header = ({ onSearch, isDarkMode, toggleDarkMode, onToggleMobileSid
           </button>
 
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-slate-900 text-white flex items-center justify-center shadow-md relative overflow-hidden border border-amber-500/30">
-              <svg viewBox="0 0 24 24" className="w-6 h-6 fill-amber-400">
-                <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 4a3 3 0 110 6 3 3 0 010-6zm0 13c-2.7 0-5.8-1.29-6-2.5V16c1.8-1.5 3.9-2 6-2s4.2.5 6 2v.5c-.2 1.21-3.3 2.5-6 2.5z" />
-              </svg>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-md relative overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+              <img src="/custom-logo.jpg" alt="GovFund Tracer Logo" className="w-full h-full object-cover" />
             </div>
 
             <div>

@@ -14,6 +14,9 @@ import {
   Tag,
   ShieldAlert,
   Info,
+  Zap,
+  Cpu,
+  Calendar,
 } from 'lucide-react';
 import { FLAG_METADATA, getRiskTierMeta } from '../../data/riskContractData';
 
@@ -25,6 +28,14 @@ const getFlagIcon = (iconName) => {
       return <Copy className="w-3.5 h-3.5" />;
     case 'Clock':
       return <Clock className="w-3.5 h-3.5" />;
+    case 'Zap':
+      return <Zap className="w-3.5 h-3.5" />;
+    case 'ShieldAlert':
+      return <ShieldAlert className="w-3.5 h-3.5" />;
+    case 'Cpu':
+      return <Cpu className="w-3.5 h-3.5" />;
+    case 'Calendar':
+      return <Calendar className="w-3.5 h-3.5" />;
     case 'AlertTriangle':
     default:
       return <AlertTriangle className="w-3.5 h-3.5" />;
@@ -57,6 +68,7 @@ export const RiskScoreCard = ({ data, onSelect, onInspectJson }) => {
     category = 'General',
     ida = 'IDA-N/A',
     risk_score = 0,
+    confidence_score = data.confidence ?? data.confidence_score ?? 0,
     flags = [],
     explanation = '',
   } = data;
@@ -79,6 +91,7 @@ export const RiskScoreCard = ({ data, onSelect, onInspectJson }) => {
       category,
       ida,
       risk_score,
+      confidence_score,
       flags,
       explanation,
     };
@@ -125,6 +138,11 @@ export const RiskScoreCard = ({ data, onSelect, onInspectJson }) => {
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60">
                 <Building className="w-3 h-3 text-blue-500" />
                 <span>IDA: {ida}</span>
+              </span>
+
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60" title="Model Detection Confidence">
+                <ShieldAlert className="w-3 h-3 text-emerald-500" />
+                <span>Confidence: {Math.round(confidence_score <= 1.0 ? confidence_score * 100 : confidence_score)}%</span>
               </span>
             </div>
 
@@ -251,6 +269,7 @@ export const RiskScoreCard = ({ data, onSelect, onInspectJson }) => {
                   category,
                   ida,
                   risk_score,
+                  confidence_score,
                   flags,
                   explanation,
                 },

@@ -156,10 +156,8 @@ export const Reports = () => {
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 shadow-gov">
         {/* Printable Official Header */}
         <div className="text-center pb-6 border-b border-slate-200 dark:border-slate-800">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-slate-900 text-amber-400 mb-2">
-            <svg viewBox="0 0 24 24" className="w-7 h-7 fill-amber-400">
-              <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 4a3 3 0 110 6 3 3 0 010-6zm0 13c-2.7 0-5.8-1.29-6-2.5V16c1.8-1.5 3.9-2 6-2s4.2.5 6 2v.5c-.2 1.21-3.3 2.5-6 2.5z" />
-            </svg>
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white mb-2 overflow-hidden border border-slate-200">
+            <img src="/custom-logo.jpg" alt="GovFund Tracer Logo" className="w-full h-full object-cover" />
           </div>
           <h1 className="text-lg font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">
             Government of India
