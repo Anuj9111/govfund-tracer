@@ -5,7 +5,7 @@
 export const translations = {
   en: {
     // Branding & Header
-    appTitle: "MPLADS e-Samiksha AI",
+    appTitle: "GovFund Tracer",
     govOrg: "Ministry of Statistics & Programme Implementation (MoSPI)",
     govSub: "Government of India",
     tagline: "AI-Powered Scheme Monitoring, Anomaly Detection & Predictive Analytics",
@@ -81,7 +81,7 @@ export const translations = {
     anom_duplicate: "Duplicate Work / Geo Match",
     anom_delayed: "Execution Delay / Inactivity",
     anom_payment: "Unusual Payment Pattern",
-    anom_deviation: "Deviation from MPLADS Norms",
+    anom_deviation: "Deviation from GovFund Tracer Norms",
 
     // Work Tracker
     stages_sanctioned: "Sanctioned",

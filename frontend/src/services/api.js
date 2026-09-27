@@ -133,6 +133,10 @@ export const api = {
     try {
       const res = await fetch(`${BACKEND_URL}/works?limit=500`, {
         signal: AbortSignal.timeout(3000),
+        headers: {
+          'X-User-Role': user.role,
+          'X-User-State': user.state || '',
+        }
       });
       if (res.ok) {
         const json = await res.json();
@@ -140,7 +144,7 @@ export const api = {
           const backendWorks = json.items.map((item) => ({
             id: item.work_id,
             work_id: item.work_id,
-            mpId: user.id || 'USR-MP-104',
+            mpId: item.mpId,
             title: item.work_description || item.work_code || `Work ${item.work_id}`,
             category: item.category || 'General Infrastructure',
             ida: item.ida || 'IDA-001',
@@ -157,9 +161,9 @@ export const api = {
             utilizedAmount: Number(item.amount_disbursed) || 1800000,
             physicalProgress: item.work_status === 'completed' ? 100 : item.flags && item.flags.includes('delayed') ? 35 : 65,
             financialProgress: item.sanction_amount > 0 ? Math.min(100, Math.round(((Number(item.amount_disbursed) || 0) / Number(item.sanction_amount)) * 100)) : 50,
-            district: user.district || item.constituency || 'Varanasi',
-            state: item.state || user.state || 'Uttar Pradesh',
-            constituency: item.constituency || user.constituency || `${item.state}`,
+            district: item.constituency || 'Varanasi',
+            state: item.state || 'Uttar Pradesh',
+            constituency: item.constituency || `${item.state}`,
             agency: item.ida ? `Implementing Agency (${item.ida})` : 'District Development Agency',
             riskLevel: item.risk_score >= 71 ? 'high' : item.risk_score >= 40 ? 'medium' : 'low',
             hasAnomaly: Array.isArray(item.flags) && item.flags.length > 0,
@@ -174,12 +178,8 @@ export const api = {
         }
       }
     } catch {
-      // Backend request timed out or failed, falling back gracefully
+      return new ApiResponse(500, [], { message: "Backend connection failed" });
     }
-
-    await delay();
-    const scopedProjects = dbWorks.filter((work) => checkProjectScope(user, work));
-    return new ApiResponse(200, scopedProjects);
   },
 
   /**
@@ -198,6 +198,10 @@ export const api = {
     try {
       const res = await fetch(`${BACKEND_URL}/works/${encodeURIComponent(projectId)}`, {
         signal: AbortSignal.timeout(3000),
+        headers: {
+          'X-User-Role': user.role,
+          'X-User-State': user.state || '',
+        }
       });
       if (res.ok) {
         const item = await res.json();
@@ -248,32 +252,13 @@ export const api = {
         return new ApiResponse(200, project);
       }
     } catch {
-      // Fallback to local
+      return new ApiResponse(500, null, { message: "Backend connection failed" });
     }
 
-    await delay();
-    const project = dbWorks.find((w) => w.id === projectId);
-    if (!project) {
-      return new ApiResponse(404, null, {
-        code: 'NOT_FOUND',
-        message: `Project record with ID ${projectId} was not found.`,
-      });
-    }
-
-    const isAuthorized = checkProjectScope(user, project);
-    if (!isAuthorized) {
-      const reason = `User role [${user.role.toUpperCase()}] scoped to [${user.jurisdiction}] cannot access project in [${project.district}, ${project.state}]`;
-      logSecurityViolation(user, projectId, 'GET_PROJECT', reason);
-      
-      return new ApiResponse(403, null, {
-        code: 'ACCESS_DENIED',
-        message: `403 Forbidden: You do not have permission to access project ${projectId}. Your jurisdiction is limited to ${user.jurisdiction}.`,
-        userJurisdiction: user.jurisdiction,
-        requiredJurisdiction: `${project.district}, ${project.state}`,
-      });
-    }
-
-    return new ApiResponse(200, project);
+    return new ApiResponse(404, null, {
+      code: 'NOT_FOUND',
+      message: `Project record with ID ${projectId} was not found on the backend.`,
+    });
   },
 
   /**
@@ -1064,7 +1049,7 @@ export const api = {
       });
     }
 
-    const stateRequiredRoles = ['mp', 'district', 'state'];
+    const stateRequiredRoles = ['mp', 'district'];
     if (stateRequiredRoles.includes(credential.role) && userObj.state) {
       const normalizedSelected = (selectedState || '').trim().toLowerCase();
       const normalizedStored   = (userObj.state || '').trim().toLowerCase();

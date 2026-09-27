@@ -42,7 +42,7 @@ export const AccessDenied = ({ requiredRoles = [], requiredPermission = null, cu
 
         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-2 max-w-lg mx-auto leading-relaxed">
           {customMessage ||
-            'You do not have the necessary security clearance or jurisdictional authority to access this resource under MPLADS RBAC Governance Policy.'}
+            'You do not have the necessary security clearance or jurisdictional authority to access this resource under GovFund Tracer RBAC Governance Policy.'}
         </p>
 
         {/* Security Audit Snapshot */}

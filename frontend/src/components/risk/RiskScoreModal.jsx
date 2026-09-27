@@ -406,7 +406,7 @@ export const RiskScoreModal = ({ item, onClose, onActionClick }) => {
 
                 <div className="space-y-2 font-mono">
                   <div className="p-2.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                    <span className="font-bold text-blue-600 dark:text-blue-400">&quot;work_id&quot;</span>: string → Unique identifier of the MPLADS work/project.
+                    <span className="font-bold text-blue-600 dark:text-blue-400">&quot;work_id&quot;</span>: string → Unique identifier of the GovFund Tracer work/project.
                   </div>
                   <div className="p-2.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                     <span className="font-bold text-blue-600 dark:text-blue-400">&quot;state&quot;</span>: string → State where the work is located.

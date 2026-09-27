@@ -1,5 +1,5 @@
 /**
- * MPLADS AI Monitoring Platform - Risk Score JSON Contract Store
+ * GovFund Tracer AI Monitoring Platform - Risk Score JSON Contract Store
  * 
  * STRICT CONTRACT SPECIFICATION:
  * {

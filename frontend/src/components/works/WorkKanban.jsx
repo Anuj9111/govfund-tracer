@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Clock, AlertTriangle, CheckCircle2, MapPin, Building2, Sparkles, Image as ImageIcon, Copy, TrendingUp } from 'lucide-react';
 import RiskBadge from '../common/RiskBadge';
@@ -33,155 +33,145 @@ export const WorkKanban = ({ works = [], onSelectWork, onVerifyPhotos }) => {
       badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
     },
   ];
+  const [activeStage, setActiveStage] = useState('all');
 
-  const getWorksByStage = (stageId) => works.filter((w) => w.stage === stageId);
+  const displayedWorks = activeStage === 'all' ? works : works.filter((w) => w.stage === activeStage);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-      {columns.map((col) => {
-        const stageWorks = getWorksByStage(col.id);
-
-        return (
-          <div
+    <div className="space-y-4">
+      {/* Stage Filter Tabs */}
+      <div className="flex gap-2 overflow-x-auto pb-2 border-b border-slate-200 dark:border-slate-800">
+        <button
+          onClick={() => setActiveStage('all')}
+          className={`px-3 py-1.5 text-xs font-semibold rounded-lg capitalize whitespace-nowrap transition-colors ${
+            activeStage === 'all'
+              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+          }`}
+        >
+          All Stages
+        </button>
+        {columns.map(col => (
+          <button
             key={col.id}
-            className="bg-slate-100/75 dark:bg-slate-900/60 rounded-2xl p-3.5 border border-slate-200 dark:border-slate-800 flex flex-col h-full min-h-[500px]"
+            onClick={() => setActiveStage(col.id)}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg capitalize whitespace-nowrap transition-colors ${
+              activeStage === col.id
+                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+            }`}
           >
-            {/* Column Header */}
-            <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
-              <span className="font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                {col.id === 'delayed' && <AlertTriangle className="w-3.5 h-3.5 text-red-500" />}
-                {col.id === 'completed' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />}
-                {col.label}
-              </span>
-              <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold font-mono ${col.badgeColor}`}>
-                {stageWorks.length}
-              </span>
-            </div>
+            {col.label}
+          </button>
+        ))}
+      </div>
 
-            {/* Cards Column */}
-            <div className="space-y-3 flex-1 overflow-y-auto pr-1">
-              {stageWorks.length === 0 ? (
-                <div className="h-32 flex items-center justify-center text-xs text-slate-400 border border-dashed border-slate-300 dark:border-slate-800 rounded-xl">
-                  No works in this stage
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {displayedWorks.length === 0 ? (
+          <div className="col-span-full h-32 flex items-center justify-center text-sm text-slate-400 border border-dashed border-slate-300 dark:border-slate-800 rounded-xl">
+            No works found for this stage.
+          </div>
+        ) : (
+          displayedWorks.map((work) => (
+            <div
+              key={work.id}
+              onClick={() => onSelectWork && onSelectWork(work)}
+              className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500 cursor-pointer transition-all duration-150 flex flex-col"
+            >
+              {/* Top Row: Category & Risk */}
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">
+                  {work.category}
+                </span>
+                <RiskBadge level={work.riskLevel} score={work.risk_score || work.riskScore} size="sm" showPulse={false} />
+              </div>
+
+              {/* Title */}
+              <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 line-clamp-2 leading-snug mb-3">
+                {work.title}
+              </h4>
+
+              {/* Meta info: Work ID & IDA */}
+              <div className="text-xs text-slate-500 dark:text-slate-400 space-y-1 mt-auto">
+                <div className="flex items-center justify-between">
+                  <span>Work ID:</span>
+                  <span className="font-mono font-semibold text-slate-700 dark:text-slate-300">{work.id || work.work_id}</span>
                 </div>
-              ) : (
-                stageWorks.map((work) => (
-                  <div
-                    key={work.id}
-                    onClick={() => onSelectWork && onSelectWork(work)}
-                    className="bg-white dark:bg-slate-800 rounded-xl p-3.5 border border-slate-200/80 dark:border-slate-700/80 shadow-sm hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500 cursor-pointer transition-all duration-150 relative"
-                  >
-                    {/* Top Row: Category & Risk */}
-                    <div className="flex items-center justify-between gap-1 mb-1.5">
-                      <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 truncate max-w-[140px]">
-                        {work.category}
-                      </span>
-                      <RiskBadge level={work.riskLevel} score={work.risk_score || work.riskScore} size="sm" showPulse={false} />
-                    </div>
+                <div className="flex items-center justify-between">
+                  <span>Stage:</span>
+                  <span className="font-semibold capitalize text-slate-700 dark:text-slate-300">
+                    {work.stage === 'inprogress' ? 'In Progress' : work.stage}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Sanctioned:</span>
+                  <span className="font-bold text-slate-900 dark:text-slate-100 font-mono">
+                    {formatINR(work.sanctionedAmount)}
+                  </span>
+                </div>
+              </div>
 
-                    {/* Title */}
-                    <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 line-clamp-2 leading-snug">
-                      {work.title}
-                    </h4>
-
-                    {/* Meta info: Work ID & IDA */}
-                    <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400 space-y-0.5">
-                      <div className="flex items-center justify-between">
-                        <span>Work ID:</span>
-                        <span className="font-mono font-semibold text-slate-700 dark:text-slate-300">{work.id || work.work_id}</span>
-                      </div>
-                      {work.ida && (
-                        <div className="flex items-center justify-between">
-                          <span>IDA:</span>
-                          <span className="font-mono font-semibold text-blue-600 dark:text-blue-400">{work.ida}</span>
-                        </div>
-                      )}
-                      <div className="flex items-center justify-between">
-                        <span>Sanctioned:</span>
-                        <span className="font-bold text-slate-900 dark:text-slate-100 font-mono">
-                          {formatINR(work.sanctionedAmount)}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Multi-Flag Chips if present */}
-                    {work.flags && work.flags.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {work.flags.map((f) => {
-                          const meta = FLAG_METADATA[f] || { label: f, badgeClass: 'bg-slate-100 text-slate-700' };
-                          return (
-                            <span key={f} className={`px-1.5 py-0.2 text-[9px] font-bold rounded ${meta.badgeClass}`}>
-                              {meta.label}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    {/* Physical vs Financial Progress Bars */}
-                    <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/60 space-y-1.5 text-[10px]">
-                      <div>
-                        <div className="flex justify-between text-slate-500 mb-0.5">
-                          <span>Physical Progress</span>
-                          <span className="font-bold text-slate-700 dark:text-slate-300">{work.physicalProgress}%</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-blue-600 rounded-full"
-                            style={{ width: `${work.physicalProgress}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="flex justify-between text-slate-500 mb-0.5">
-                          <span>Financial Disbursed</span>
-                          <span className="font-bold text-emerald-600 dark:text-emerald-400">{work.financialProgress}%</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-emerald-500 rounded-full"
-                            style={{ width: `${work.financialProgress}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Delay Prediction or ML Tag */}
-                    {work.delayLikelihood > 40 && (
-                      <div className="mt-2.5 px-2 py-1 rounded bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 flex items-center justify-between text-[10px] text-red-700 dark:text-red-400">
-                        <span className="flex items-center gap-1 font-semibold">
-                          <Clock className="w-3 h-3" /> Delay Risk
-                        </span>
-                        <span className="font-mono font-bold">{work.delayLikelihood}% prob.</span>
-                      </div>
-                    )}
-
-                    {/* Photo verification trigger */}
-                    {work.beforePhoto && (
-                      <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
-                        <span className="text-[10px] text-slate-400 flex items-center gap-1">
-                          <ImageIcon className="w-3 h-3 text-blue-500" /> Geotag Photos
-                        </span>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (onVerifyPhotos) onVerifyPhotos(work);
-                          }}
-                          className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline"
-                        >
-                          Inspect Photos
-                        </button>
-                      </div>
-                    )}
+              {/* Physical vs Financial Progress Bars */}
+              <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700 space-y-2 text-xs">
+                <div>
+                  <div className="flex justify-between text-slate-500 mb-1">
+                    <span>Physical Progress</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300">{work.physicalProgress}%</span>
                   </div>
-                ))
+                  <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-blue-600 rounded-full"
+                      style={{ width: `${work.physicalProgress}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-slate-500 mb-1">
+                    <span>Financial Disbursed</span>
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400">{work.financialProgress}%</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-emerald-500 rounded-full"
+                      style={{ width: `${work.financialProgress}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Delay Prediction or ML Tag */}
+              {work.delayLikelihood > 40 && (
+                <div className="mt-3 px-2 py-1.5 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 flex items-center justify-between text-xs text-red-700 dark:text-red-400">
+                  <span className="flex items-center gap-1.5 font-semibold">
+                    <Clock className="w-3.5 h-3.5" /> Delay Risk
+                  </span>
+                  <span className="font-mono font-bold">{work.delayLikelihood}% prob.</span>
+                </div>
+              )}
+
+              {/* Photo verification trigger */}
+              {work.beforePhoto && (
+                <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                  <span className="text-xs text-slate-400 flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5 text-blue-500" /> Geotag Photos
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onVerifyPhotos) onVerifyPhotos(work);
+                    }}
+                    className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    Inspect Photos
+                  </button>
+                </div>
               )}
             </div>
-          </div>
-        );
-      })}
+          ))
+        )}
+      </div>
     </div>
   );
 };

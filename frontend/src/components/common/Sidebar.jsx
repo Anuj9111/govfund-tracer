@@ -148,13 +148,13 @@ export const Sidebar = ({ isOpen, onClose }) => {
       {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 lg:hidden"
           onClick={onClose}
         />
       )}
 
       <aside
-        className={`fixed lg:sticky top-0 lg:top-[61px] left-0 z-40 h-screen lg:h-[calc(100vh-61px)] w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between transition-transform duration-300 ease-in-out no-print ${
+        className={`fixed lg:sticky top-0 lg:top-[65px] left-0 z-50 lg:z-30 h-screen lg:h-[calc(100vh-65px)] w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col justify-between transition-transform duration-300 ease-in-out no-print ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
@@ -236,7 +236,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
           </div>
 
           <div className="text-[11px] text-slate-700 dark:text-slate-300 px-1 flex items-center justify-between">
-            <span className="font-semibold text-slate-700 dark:text-slate-300">MoSPI MPLADS</span>
+            <span className="font-semibold text-slate-700 dark:text-slate-300">MoSPI GovFund Tracer</span>
             <span className="font-mono text-slate-700 dark:text-slate-300">2026</span>
           </div>
         </div>

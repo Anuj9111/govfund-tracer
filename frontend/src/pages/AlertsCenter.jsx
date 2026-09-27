@@ -38,6 +38,7 @@ export const AlertsCenter = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedRisk, setSelectedRisk] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedState, setSelectedState] = useState('all');
 
   const categories = [
     { id: 'all', label: 'All Anomalies' },
@@ -63,14 +64,20 @@ export const AlertsCenter = () => {
     { id: 'resolved', label: 'Resolved' },
   ];
 
+  const uniqueStates = useMemo(() => {
+    const set = new Set(alerts.map((r) => r.state));
+    return ['all', ...Array.from(set).sort()];
+  }, [alerts]);
+
   const filteredAlerts = useMemo(() => {
     return alerts.filter((item) => {
       const matchCat = selectedCategory === 'all' || item.category === selectedCategory;
       const matchRisk = selectedRisk === 'all' || item.riskLevel === selectedRisk;
       const matchStatus = selectedStatus === 'all' || item.status === selectedStatus;
-      return matchCat && matchRisk && matchStatus;
+      const matchState = selectedState === 'all' || item.state === selectedState;
+      return matchCat && matchRisk && matchStatus && matchState;
     });
-  }, [alerts, selectedCategory, selectedRisk, selectedStatus]);
+  }, [alerts, selectedCategory, selectedRisk, selectedStatus, selectedState]);
 
   const columns = [
     {
@@ -287,13 +294,31 @@ export const AlertsCenter = () => {
               </select>
             </div>
 
-            <div className="sm:col-span-2 flex items-end justify-end gap-2">
+            <div>
+              <label className="block text-[11px] font-bold uppercase text-slate-500 mb-1">
+                State
+              </label>
+              <select
+                value={selectedState}
+                onChange={(e) => setSelectedState(e.target.value)}
+                className="w-full text-xs p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
+              >
+                {uniqueStates.map((s) => (
+                  <option key={s} value={s}>
+                    {s === 'all' ? 'All States' : s}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-end justify-end gap-2">
               <button
                 type="button"
                 onClick={() => {
                   setSelectedCategory('all');
                   setSelectedRisk('all');
                   setSelectedStatus('all');
+                  setSelectedState('all');
                 }}
                 className="px-3 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               >
@@ -308,7 +333,7 @@ export const AlertsCenter = () => {
             data={filteredAlerts}
             searchKey="title"
             pageSize={6}
-            exportFilename="MPLADS_Anomaly_Alerts.csv"
+            exportFilename="GovFund_Tracer_Anomaly_Alerts.csv"
           />
 
           {/* Drill-down Modal */}

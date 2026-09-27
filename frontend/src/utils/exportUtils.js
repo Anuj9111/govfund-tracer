@@ -21,7 +21,7 @@ export function triggerCelebration() {
  * @param {Array<object>} data 
  * @param {string} filename 
  */
-export function exportToCSV(data, filename = 'MPLADS_Report.csv') {
+export function exportToCSV(data, filename = 'GovFund_Tracer_Report.csv') {
   if (!data || !data.length) return;
 
   const headers = Object.keys(data[0]);
@@ -57,7 +57,7 @@ export function exportToCSV(data, filename = 'MPLADS_Report.csv') {
  * @param {object|Array} data 
  * @param {string} filename 
  */
-export function exportToJSON(data, filename = 'MPLADS_Export.json') {
+export function exportToJSON(data, filename = 'GovFund_Tracer_Export.json') {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
