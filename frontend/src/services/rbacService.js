@@ -1,6 +1,6 @@
 /**
  * Role-Based Access Control (RBAC) Service
- * Implements granular roles, permissions, scopes, and validation policies for MPLADS e-Samiksha AI.
+ * Implements granular roles, permissions, scopes, and validation policies for GovFund Tracer e-Samiksha AI.
  */
 
 export const ROLES = {

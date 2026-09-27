@@ -168,36 +168,86 @@ export const IndiaMap = ({ onSelectState, selectedStateId }) => {
               </span>
             </div>
 
-            <div className="mt-4 space-y-3 text-xs">
-              <div className="flex justify-between py-1.5 border-b border-slate-800/80">
-                <span className="text-slate-400">Total Sanctioned Fund:</span>
-                <span className="font-mono font-bold text-white">
-                  ₹{activeStateData.totalFunds} Cr
-                </span>
+            <div className="mt-4 space-y-4 text-xs">
+              <div className="flex flex-col gap-1.5 pb-2 border-b border-slate-800/80">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
+                    Total Sanctioned Fund
+                  </span>
+                  <span className="font-mono font-bold text-white text-sm">
+                    ₹{activeStateData.totalFunds} Cr
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-800/80">
-                <span className="text-slate-400">Expended So Far:</span>
-                <span className="font-mono font-bold text-emerald-400">
-                  ₹{activeStateData.utilizedFunds} Cr ({activeStateData.utilizationRate}%)
-                </span>
+              
+              <div className="flex flex-col gap-2 pb-2 border-b border-slate-800/80">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                    Expended So Far
+                  </span>
+                  <span className="font-mono font-bold text-emerald-400 text-sm">
+                    ₹{activeStateData.utilizedFunds} Cr
+                  </span>
+                </div>
+                <div className="w-full bg-slate-800 rounded-full h-1.5 mb-1">
+                  <div 
+                    className={`h-1.5 rounded-full ${activeStateData.utilizationRate >= 80 ? 'bg-emerald-500' : activeStateData.utilizationRate >= 60 ? 'bg-amber-500' : 'bg-red-500'}`} 
+                    style={{ width: `${activeStateData.utilizationRate}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-[10px] text-slate-500">
+                  <span>Utilization Rate</span>
+                  <span className="font-mono font-bold">{activeStateData.utilizationRate}%</span>
+                </div>
               </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-800/80">
-                <span className="text-slate-400">Active MPLADS Projects:</span>
-                <span className="font-mono font-bold text-white">
+              
+              <div className="flex justify-between items-center pb-2 border-b border-slate-800/80">
+                <span className="text-slate-400 flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-purple-400"></div>
+                  Active GovFund Tracer Projects
+                </span>
+                <span className="font-mono font-bold text-white text-sm bg-slate-800 px-2 py-0.5 rounded-md border border-slate-700">
                   {activeStateData.activeWorks.toLocaleString()}
                 </span>
               </div>
-              <div className="flex justify-between py-1.5 border-b border-slate-800/80">
-                <span className="text-slate-400">High Risk Flagged Works:</span>
-                <span className="font-mono font-bold text-red-400">
-                  {activeStateData.highAnomalies} works
+              
+              <div className="flex justify-between items-center pb-2 border-b border-slate-800/80">
+                <span className="text-slate-400 flex items-center gap-1.5">
+                  <ShieldAlert className="w-3.5 h-3.5 text-red-400" />
+                  High Risk Flagged Works
+                </span>
+                <span className="font-mono font-bold text-red-400 text-sm flex items-center gap-1">
+                  {activeStateData.highAnomalies}
+                  <span className="text-[10px] text-slate-500 font-sans">works</span>
                 </span>
               </div>
-              <div className="flex justify-between py-1.5">
-                <span className="text-slate-400">Composite ML Risk Index:</span>
-                <span className="font-mono font-bold text-amber-400">
-                  {activeStateData.riskScore} / 100
-                </span>
+              
+              <div className="flex flex-col gap-2 pt-1">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 flex items-center gap-1.5">
+                    <TrendingUp className="w-3.5 h-3.5 text-amber-400" />
+                    Composite ML Risk Index
+                  </span>
+                  <span className={`font-mono font-bold text-sm px-2 py-0.5 rounded-md ${
+                    activeStateData.riskScore >= 75 ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 
+                    activeStateData.riskScore >= 45 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 
+                    'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  }`}>
+                    {activeStateData.riskScore} / 100
+                  </span>
+                </div>
+                <div className="w-full bg-slate-800 rounded-full h-1.5 mt-1">
+                  <div 
+                    className={`h-1.5 rounded-full ${
+                      activeStateData.riskScore >= 75 ? 'bg-red-500' : 
+                      activeStateData.riskScore >= 45 ? 'bg-amber-500' : 
+                      'bg-emerald-500'
+                    }`} 
+                    style={{ width: `${activeStateData.riskScore}%` }}
+                  ></div>
+                </div>
               </div>
             </div>
           </div>

@@ -508,6 +508,7 @@ export const api = {
             category: item.category || 'General',
             ida: item.ida || 'IDA-001',
             risk_score: item.risk_score !== null && item.risk_score !== undefined ? Number(item.risk_score) : 0,
+            confidence_score: item.confidence_score !== null && item.confidence_score !== undefined ? Number(item.confidence_score) : Number(item.confidence ?? 0),
             flags: Array.isArray(item.flags) ? item.flags : [],
             explanation: item.explanation || 'Compliant with scheme guidelines.',
           }));
@@ -589,6 +590,7 @@ export const api = {
           category: item.category || 'General',
           ida: item.ida || 'IDA-001',
           risk_score: Number(item.risk_score ?? 0),
+          confidence_score: Number(item.confidence ?? item.confidence_score ?? 0),
           flags: Array.isArray(item.flags) ? item.flags : [],
           explanation: item.explanation || 'Compliant with scheme guidelines.',
         });

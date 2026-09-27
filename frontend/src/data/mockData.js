@@ -1,5 +1,5 @@
 /**
- * Mock Data Store for MPLADS AI-Powered Monitoring & Analytics Platform
+ * Mock Data Store for GovFund Tracer AI-Powered Monitoring & Analytics Platform
  * Realistic datasets modeled after MoSPI guidelines and parliamentary fund allocations.
  * 
  * NON-NEGOTIABLE PRIVACY POLICY:
@@ -183,7 +183,7 @@ export const MOCK_USERS = {
     id: "USR-MOSPI-01",
     name: "Shri Amit Verma",
     role: "ministry",
-    roleName: "Joint Secretary (MPLADS Division), MoSPI",
+    roleName: "Joint Secretary (GovFund Tracer Division), MoSPI",
     constituency: "National Pan-India Oversight",
     state: null,
     district: null,
@@ -507,7 +507,7 @@ export const MOCK_ALERTS = [
     summary: "Procurement invoice includes recurring operational items which violate non-capital expenditure restrictions.",
     aiReasoning: [
       "Expenditure classification includes ₹6.5 Lakhs allocated for operational consumables.",
-      "MPLADS guidelines permit only capital assets; recurring costs are restricted.",
+      "GovFund Tracer guidelines permit only capital assets; recurring costs are restricted.",
     ],
     peerComparison: {
       capitalAssetPct: "81.4%",
@@ -844,7 +844,7 @@ export const MOCK_AGENCY_SCORECARDS = [
 ];
 
 export const MOCK_MODEL_METRICS = {
-  activeVersion: "MPLADS-Samiksha-v4.2.8-Ensemble",
+  activeVersion: "GovFund-Tracer-Samiksha-v4.2.8-Ensemble",
   lastRetrained: "2026-03-20 04:00 UTC",
   accuracy: "94.6%",
   precision: "92.8%",
@@ -882,7 +882,7 @@ export const MOCK_DUPLICATE_PAIRS = [
     workA: {
       id: "WORK-003",
       title: "Interlocking Brick Paving & Drainage Channel at Phulpur Ward-14",
-      scheme: "MPLADS (18th Lok Sabha)",
+      scheme: "GovFund Tracer (18th Lok Sabha)",
       sanctionDate: "2025-10-05",
       amount: "₹28.0 Lakh",
       agency: "District Rural Works Agency A",

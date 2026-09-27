@@ -19,6 +19,9 @@ import {
   ArrowRight,
   Info,
   FileCheck2,
+  Zap,
+  Cpu,
+  Calendar,
 } from 'lucide-react';
 import {
   FLAG_METADATA,
@@ -34,6 +37,14 @@ const getFlagIcon = (iconName) => {
       return <Copy className="w-4 h-4" />;
     case 'Clock':
       return <Clock className="w-4 h-4" />;
+    case 'Zap':
+      return <Zap className="w-4 h-4" />;
+    case 'ShieldAlert':
+      return <ShieldAlert className="w-4 h-4" />;
+    case 'Cpu':
+      return <Cpu className="w-4 h-4" />;
+    case 'Calendar':
+      return <Calendar className="w-4 h-4" />;
     case 'AlertTriangle':
     default:
       return <AlertTriangle className="w-4 h-4" />;
@@ -57,6 +68,7 @@ export const RiskScoreModal = ({ item, onClose, onActionClick }) => {
     category,
     ida,
     risk_score,
+    confidence_score = item.confidence ?? item.confidence_score ?? 0,
     flags = [],
     explanation,
   } = item;
@@ -70,6 +82,7 @@ export const RiskScoreModal = ({ item, onClose, onActionClick }) => {
     category,
     ida,
     risk_score,
+    confidence_score,
     flags,
     explanation,
   };
@@ -126,6 +139,11 @@ export const RiskScoreModal = ({ item, onClose, onActionClick }) => {
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-mono font-bold bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300">
                   <Building className="w-3.5 h-3.5 text-blue-500" />
                   <span>IDA: {ida}</span>
+                </span>
+
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-mono font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/60">
+                  <ShieldAlert className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>Confidence: {Math.round(confidence_score <= 1.0 ? confidence_score * 100 : confidence_score)}%</span>
                 </span>
 
                 <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${tierMeta.badgeBg}`}>
@@ -223,10 +241,18 @@ export const RiskScoreModal = ({ item, onClose, onActionClick }) => {
                   </div>
                 </div>
 
-                <div className="text-right sm:border-l border-slate-200 dark:border-slate-800 sm:pl-4">
-                  <div className="text-xs text-slate-500">Active Anomaly Flags</div>
-                  <div className="text-xl font-bold font-mono text-slate-900 dark:text-white">
-                    {flags.length}
+                <div className="flex items-center gap-4 text-right sm:border-l border-slate-200 dark:border-slate-800 sm:pl-4">
+                  <div>
+                    <div className="text-xs text-slate-500">Active Flags</div>
+                    <div className="text-xl font-bold font-mono text-slate-900 dark:text-white">
+                      {flags.length}
+                    </div>
+                  </div>
+                  <div className="border-l border-slate-200 dark:border-slate-800 pl-4">
+                    <div className="text-xs text-slate-500">Model Confidence</div>
+                    <div className="text-xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                      {Math.round(confidence_score <= 1.0 ? confidence_score * 100 : confidence_score)}%
+                    </div>
                   </div>
                 </div>
               </div>
@@ -296,32 +322,46 @@ export const RiskScoreModal = ({ item, onClose, onActionClick }) => {
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
                   Contract Field Attributes
                 </h4>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 text-xs">
                   <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-                    <div className="text-slate-500">work_id</div>
+                    <div className="text-slate-500 font-mono">work_id</div>
                     <div className="font-bold font-mono text-slate-900 dark:text-slate-100 truncate mt-0.5">
                       {work_id}
                     </div>
                   </div>
 
                   <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-                    <div className="text-slate-500">ida</div>
+                    <div className="text-slate-500 font-mono">ida</div>
                     <div className="font-bold font-mono text-blue-600 dark:text-blue-400 truncate mt-0.5">
                       {ida}
                     </div>
                   </div>
 
                   <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-                    <div className="text-slate-500">state</div>
+                    <div className="text-slate-500 font-mono">state</div>
                     <div className="font-bold text-slate-900 dark:text-slate-100 truncate mt-0.5">
                       {state}
                     </div>
                   </div>
 
                   <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-                    <div className="text-slate-500">category</div>
+                    <div className="text-slate-500 font-mono">category</div>
                     <div className="font-bold text-slate-900 dark:text-slate-100 truncate mt-0.5">
                       {category}
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                    <div className="text-slate-500 font-mono">risk_score</div>
+                    <div className="font-bold font-mono text-amber-600 dark:text-amber-400 truncate mt-0.5">
+                      {risk_score}/100
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60">
+                    <div className="text-emerald-700 dark:text-emerald-400 font-mono font-semibold">confidence_score</div>
+                    <div className="font-bold font-mono text-emerald-800 dark:text-emerald-300 truncate mt-0.5">
+                      {Math.round(confidence_score <= 1.0 ? confidence_score * 100 : confidence_score)}%
                     </div>
                   </div>
                 </div>
@@ -406,7 +446,7 @@ export const RiskScoreModal = ({ item, onClose, onActionClick }) => {
 
                 <div className="space-y-2 font-mono">
                   <div className="p-2.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                    <span className="font-bold text-blue-600 dark:text-blue-400">&quot;work_id&quot;</span>: string → Unique identifier of the MPLADS work/project.
+                    <span className="font-bold text-blue-600 dark:text-blue-400">&quot;work_id&quot;</span>: string → Unique identifier of the GovFund Tracer work/project.
                   </div>
                   <div className="p-2.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                     <span className="font-bold text-blue-600 dark:text-blue-400">&quot;state&quot;</span>: string → State where the work is located.

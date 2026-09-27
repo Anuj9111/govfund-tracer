@@ -48,6 +48,8 @@ def format_work_row(row: sqlite3.Row) -> Dict[str, Any]:
         "category": row["category"],
         "ida": row["ida"],
         "risk_score": row["risk_score"],
+        "confidence": row["confidence"] if "confidence" in row.keys() else 0,
+        "confidence_score": row["confidence"] if "confidence" in row.keys() else 0,
         "flags": flags_parsed,
         "explanation": row["explanation"],
         "work_code": row["work_code"],
@@ -147,7 +149,7 @@ def get_work_by_id(work_id: str):
 def get_work_risk(work_id: str):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT work_id, risk_score, flags, explanation FROM works WHERE work_id = ?", (work_id.strip(),))
+    cur.execute("SELECT work_id, risk_score, flags, explanation, confidence FROM works WHERE work_id = ?", (work_id.strip(),))
     row = cur.fetchone()
     conn.close()
 
@@ -165,6 +167,7 @@ def get_work_risk(work_id: str):
     return {
         "work_id": row["work_id"],
         "risk_score": row["risk_score"],
+        "confidence_score": row["confidence"],
         "flags": flags_parsed,
         "explanation": row["explanation"]
     }

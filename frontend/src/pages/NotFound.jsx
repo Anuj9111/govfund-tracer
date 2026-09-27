@@ -12,7 +12,7 @@ export const NotFound = () => {
         404 — Page Not Found
       </h1>
       <p className="text-xs text-slate-500 max-w-sm mt-2">
-        The requested scheme module or record does not exist or has been relocated within the e-Samiksha portal.
+        The requested scheme module or record does not exist or has been relocated within the GovFund Tracer portal.
       </p>
       <Link
         to="/"

@@ -41,8 +41,8 @@ const ROLE_OPTIONS = [
     id: 'state',
     label: 'State Nodal Authority (SNA)',
     icon: <Building className="w-4 h-4 text-blue-500" />,
-    hint: 'State government MPLADS email',
-    needsState: true,
+    hint: 'State government GovFund Tracer email',
+    needsState: false,
     needsDistrict: false,
   },
   {
@@ -343,7 +343,7 @@ const DEMO_CREDENTIALS = [
     password: 'MoSPI@Ministry24',
     state: '',
     district: '',
-    label: 'JS (MPLADS), MoSPI — Shri Amit Verma',
+    label: 'JS (GovFund Tracer), MoSPI — Shri Amit Verma',
   },
 ];
 
@@ -476,7 +476,7 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-[#0a1628] to-blue-950 text-white flex flex-col">
+    <div className="min-h-screen bg-white text-slate-900 flex flex-col">
       {/* Government Tricolor */}
       <div className="h-1.5 w-full bg-gradient-to-r from-orange-500 via-white to-green-600" />
 
@@ -487,7 +487,7 @@ export const Login = () => {
           <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
 
           {/* Card */}
-          <div className="relative bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-2xl shadow-2xl overflow-hidden">
+          <div className="relative bg-white border border-slate-200 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden">
             <div className="h-0.5 w-full bg-gradient-to-r from-orange-500 via-amber-400 to-orange-500" />
 
             <div className="p-7 sm:p-8">
@@ -498,10 +498,10 @@ export const Login = () => {
                     <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 4a3 3 0 110 6 3 3 0 010-6zm0 13c-2.7 0-5.8-1.29-6-2.5V16c1.8-1.5 3.9-2 6-2s4.2.5 6 2v.5c-.2 1.21-3.3 2.5-6 2.5z" />
                   </svg>
                 </div>
-                <h1 className="text-xl font-extrabold font-display tracking-tight text-white">
-                  MPLADS <span className="text-orange-400">e-Samiksha</span> AI
+                <h1 className="text-xl font-extrabold font-display tracking-tight text-slate-900">
+                  GovFund <span className="text-orange-500">Tracer</span>
                 </h1>
-                <p className="text-[11px] text-slate-400 mt-1">
+                <p className="text-[11px] text-slate-500 mt-1">
                   Ministry of Statistics &amp; Programme Implementation — Government of India
                 </p>
                 <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-[10px] text-emerald-300 font-mono">
@@ -515,24 +515,24 @@ export const Login = () => {
 
                 {/* 1. Role */}
                 <div ref={dropRef} className="relative">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
                     Role
                   </label>
                   <button
                     type="button"
                     id="role-dropdown-btn"
                     onClick={() => setRoleDropOpen(p => !p)}
-                    className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-slate-800 border border-slate-600 hover:border-slate-500 transition-colors text-left focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                    className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-white border border-slate-300 hover:border-blue-400 transition-colors text-left focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       {activeRole?.icon}
-                      <span className="text-sm font-semibold text-white truncate">{activeRole?.label}</span>
+                      <span className="text-sm font-semibold text-slate-800 truncate">{activeRole?.label}</span>
                     </div>
-                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform shrink-0 ${roleDropOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform shrink-0 ${roleDropOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {roleDropOpen && (
-                    <div className="absolute top-full mt-1.5 left-0 right-0 z-30 bg-slate-800 border border-slate-600 rounded-xl shadow-2xl overflow-hidden">
+                    <div className="absolute top-full mt-1.5 left-0 right-0 z-30 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden">
                       {ROLE_OPTIONS.map(opt => (
                         <button
                           key={opt.id}
@@ -540,8 +540,8 @@ export const Login = () => {
                           onClick={() => handleRoleChange(opt.id)}
                           className={`w-full flex items-center gap-3 px-4 py-3 text-left text-sm transition-colors ${
                             selectedRole === opt.id
-                              ? 'bg-blue-900/60 text-white'
-                              : 'text-slate-300 hover:bg-slate-700'
+                              ? 'bg-blue-50 text-blue-700'
+                              : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
                           {opt.icon}
@@ -561,7 +561,7 @@ export const Login = () => {
                 {/* 2. State — shown for MP, District, State roles */}
                 {activeRole?.needsState && (
                   <div>
-                    <label htmlFor="login-state" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                    <label htmlFor="login-state" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
                       State
                     </label>
                     <div className="relative">
@@ -570,11 +570,11 @@ export const Login = () => {
                         id="login-state"
                         value={selectedState}
                         onChange={e => { setSelectedState(e.target.value); setDistrict(''); clearError(); }}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-800 border border-slate-600 text-sm text-white appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-300 text-sm text-slate-800 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors"
                       >
                         <option value="" disabled className="text-slate-500">Select State / UT</option>
                         {INDIAN_STATES.map(s => (
-                          <option key={s} value={s} className="bg-slate-800">{s}</option>
+                          <option key={s} value={s} className="bg-white">{s}</option>
                         ))}
                       </select>
                       <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -585,7 +585,7 @@ export const Login = () => {
                 {/* 3. District — dropdown populated from selected state */}
                 {activeRole?.needsDistrict && (
                   <div>
-                    <label htmlFor="login-district" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                    <label htmlFor="login-district" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
                       District
                     </label>
                     <div className="relative">
@@ -595,17 +595,17 @@ export const Login = () => {
                         value={district}
                         disabled={!selectedState}
                         onChange={e => { setDistrict(e.target.value); clearError(); }}
-                        className={`w-full pl-10 pr-8 py-3 rounded-xl bg-slate-800 border text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors ${
+                        className={`w-full pl-10 pr-8 py-3 rounded-xl bg-white border text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors ${
                           !selectedState
-                            ? 'border-slate-700 text-slate-600 cursor-not-allowed opacity-60'
-                            : 'border-slate-600 text-white cursor-pointer'
+                            ? 'border-slate-200 text-slate-400 cursor-not-allowed opacity-60'
+                            : 'border-slate-300 text-slate-800 cursor-pointer'
                         }`}
                       >
                         <option value="" disabled className="text-slate-500">
                           {selectedState ? 'Select District' : '— Select a state first —'}
                         </option>
                         {(STATE_DISTRICTS[selectedState] || []).map(d => (
-                          <option key={d} value={d} className="bg-slate-800">{d}</option>
+                          <option key={d} value={d} className="bg-white">{d}</option>
                         ))}
                       </select>
                       <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -618,7 +618,7 @@ export const Login = () => {
 
                 {/* 4. Email / User ID */}
                 <div>
-                  <label htmlFor="login-email" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                  <label htmlFor="login-email" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
                     Email / NIC User ID
                   </label>
                   <input
@@ -628,14 +628,14 @@ export const Login = () => {
                     placeholder="user@nic.in"
                     value={email}
                     onChange={e => { setEmail(e.target.value); clearError(); }}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-600 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors"
                   />
                 </div>
 
                 {/* 5. Password */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label htmlFor="login-password" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    <label htmlFor="login-password" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500">
                       Password
                     </label>
                     <button
@@ -654,7 +654,7 @@ export const Login = () => {
                       placeholder="Enter your secure password"
                       value={password}
                       onChange={e => { setPassword(e.target.value); clearError(); }}
-                      className="w-full px-4 py-3 pr-12 rounded-xl bg-slate-800 border border-slate-600 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors"
+                      className="w-full px-4 py-3 pr-12 rounded-xl bg-white border border-slate-300 text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors"
                     />
                     <button
                       type="button"
@@ -712,11 +712,11 @@ export const Login = () => {
             </div>
 
             {/* ── Demo Credentials Panel ── */}
-            <div className="border-t border-slate-700/60">
+            <div className="border-t border-slate-100">
               <button
                 type="button"
                 onClick={() => setShowDemo(p => !p)}
-                className="w-full flex items-center justify-between px-6 py-3.5 text-[11px] text-slate-400 hover:text-slate-300 hover:bg-slate-800/40 transition-colors"
+                className="w-full flex items-center justify-between px-6 py-3.5 text-[11px] text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors"
               >
                 <div className="flex items-center gap-2">
                   <KeyRound className="w-3.5 h-3.5" />
@@ -735,12 +735,12 @@ export const Login = () => {
                       key={i}
                       type="button"
                       onClick={() => fillDemo(cred)}
-                      className="w-full text-left px-3 py-2.5 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/40 transition-colors"
+                      className="w-full text-left px-3 py-2.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <div className="text-[10px] font-bold text-slate-200 truncate">{cred.label}</div>
-                          <div className="text-[10px] font-mono text-slate-400 mt-0.5 truncate">{cred.email}</div>
+                          <div className="text-[10px] font-bold text-slate-800 truncate">{cred.label}</div>
+                          <div className="text-[10px] font-mono text-slate-500 mt-0.5 truncate">{cred.email}</div>
                           {cred.state && (
                             <div className="text-[9px] text-slate-500 mt-0.5">
                               {cred.state}{cred.district ? ` › ${cred.district}` : ''}

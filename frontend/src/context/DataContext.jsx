@@ -20,6 +20,7 @@ export const DataProvider = ({ children }) => {
   const [isAiRunning, setIsAiRunning] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [lastSecurityEvent, setLastSecurityEvent] = useState(null);
+  const [globalSearch, setGlobalSearch] = useState('');
 
   // Simulated notifications
   const [notifications, setNotifications] = useState([
@@ -210,6 +211,8 @@ export const DataProvider = ({ children }) => {
         toastMessage,
         showToast,
         roleKpis,
+        globalSearch,
+        setGlobalSearch,
         refreshData: loadScopedData,
       }}
     >
